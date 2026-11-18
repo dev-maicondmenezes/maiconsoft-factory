@@ -81,8 +81,8 @@ jobs:
             test -x "$f" || { echo "Falta permissão de execução: $f"; exit 1; }
           done
           grep -Fq 'curl -fsSL https://raw.githubusercontent.com/dev-maicondmenezes/maiconsoft-factory/main/install.sh | bash' README.md
-          if grep -RqE '\| install([^a-zA-Z-]|$)' README.md install.sh; then
-            echo "ERRO: comando '| install' inválido encontrado"
+          if grep -RqE '(curl|wget).*\|[[:space:]]*install([[:space:]]|$)' README.md install.sh; then
+            echo "ERRO: comando 'curl ... | install' inválido encontrado"
             exit 1
           fi
 
@@ -165,11 +165,16 @@ jobs:
             openssl util-linux sudo
 
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Rodar o bootstrap real (one-liner, repo local)
-        env:
-          MAICONSOFT_REPO_URL: file://${{ github.workspace }}
-        run: bash install.sh
+        run: |
+          # Em container jobs, GITHUB_WORKSPACE é o caminho montado no container,
+          # diferente do caminho do host usado pelo contexto github.workspace.
+          export MAICONSOFT_REPO_URL="file://${GITHUB_WORKSPACE}"
+          echo "Repositório de origem: $MAICONSOFT_REPO_URL"
+          bash install.sh
 
       - name: Assertivas pós-instalação
         shell: bash
