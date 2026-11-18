@@ -7,15 +7,18 @@ _lib_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 export REPO_OWNER="dev-maicondmenezes"
 export REPO_NAME="maiconsoft-factory"
-export REPO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}.git"
+# Overrides existem apenas para permitir testes de integração em CI.
+# Em produção nenhuma variável MAICONSOFT_* é definida e os caminhos são os fixos.
+export REPO_URL="${MAICONSOFT_REPO_URL:-https://github.com/${REPO_OWNER}/${REPO_NAME}.git}"
 export FACTORY_USER="maiconsoft"
-export FACTORY_HOME="/home/${FACTORY_USER}"
-export FACTORY_DIR="${FACTORY_HOME}/factory"
-export PROJECTS_DIR="${FACTORY_DIR}/projects"
-export CONFIG_DIR="/etc/maiconsoft"
+export FACTORY_HOME="${MAICONSOFT_HOME:-/home/${FACTORY_USER}}"
+export FACTORY_DIR="${MAICONSOFT_FACTORY_DIR:-${FACTORY_HOME}/factory}"
+export PROJECTS_DIR="${MAICONSOFT_PROJECTS_DIR:-${FACTORY_DIR}/projects}"
+export CONFIG_DIR="${MAICONSOFT_CONFIG_DIR:-/etc/maiconsoft}"
 export PROFILES_FILE="${CONFIG_DIR}/profiles"
 export COMPOSE_FILE="${FACTORY_DIR}/docker-compose.yml"
 export ENV_FILE="${FACTORY_DIR}/.env"
+export CI="${MAICONSOFT_CI:-0}"
 
 if [ "$EUID" -eq 0 ]; then
   SUDO=""
@@ -23,6 +26,16 @@ else
   SUDO="sudo"
 fi
 export SUDO
+
+# Executa um comando como outro usuário, funcionando como root ou via sudo.
+as_user() {
+  local target="$1"; shift
+  if [ "$EUID" -eq 0 ]; then
+    runuser -u "$target" -- "$@"
+  else
+    sudo -u "$target" -- "$@"
+  fi
+}
 
 has() { command -v "$1" >/dev/null 2>&1; }
 

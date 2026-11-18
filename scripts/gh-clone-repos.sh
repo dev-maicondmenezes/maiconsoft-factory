@@ -48,10 +48,10 @@ for full in $chosen; do
   dest="${PROJECTS_DIR}/${name}"
   if [ -d "$dest/.git" ]; then
     info "  ⏭️  ${name} já existe. Atualizando..."
-    $SUDO -u "$FACTORY_USER" git -C "$dest" pull --ff-only >/dev/null 2>&1 || warn "  Falha ao atualizar ${name}."
+    as_user "$FACTORY_USER" git -C "$dest" pull --ff-only >/dev/null 2>&1 || warn "  Falha ao atualizar ${name}."
   else
     info "  📥 Clonando ${full}..."
-    if $SUDO -u "$FACTORY_USER" git clone --depth 1 "https://github.com/${full}.git" "$dest" >/dev/null 2>&1; then
+    if as_user "$FACTORY_USER" git clone --depth 1 "https://github.com/${full}.git" "$dest" >/dev/null 2>&1; then
       ok "  ${name} clonado."
       CLONED=$((CLONED+1))
     else

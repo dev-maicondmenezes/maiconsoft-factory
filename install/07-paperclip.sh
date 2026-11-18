@@ -8,6 +8,12 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TEAM_FILE="${FACTORY_DIR}/config/paperclip/team.json"
 require_repo_file config/paperclip/team.json
 
+if [ "$CI" = "1" ]; then
+  info "Modo CI: validando a definição da equipe sem subir a API."
+  python3 "${FACTORY_DIR}/scripts/validate-config.py" --team-only
+  exit 0
+fi
+
 BASE="http://127.0.0.1:3100"
 TOKEN=""
 if [ -f "$ENV_FILE" ]; then

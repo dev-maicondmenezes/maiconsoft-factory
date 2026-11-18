@@ -33,7 +33,7 @@ ask_yes_no() {
 
 # whiptail com fallback para leitura simples
 choose_checklist() {
-  local title="$1" text="$2" shift_n=2
+  local title="$1" text="$2"
   if command -v whiptail >/dev/null 2>&1 && [ -t 0 ]; then
     whiptail --title "$title" --checklist "$text" 20 78 12 "${@:3}" 3>&1 1>&2 2>&3
   else
@@ -79,6 +79,9 @@ br_gradient_art() {
     if (( width <= 1 )); then scaled=0; else scaled=$(( i * 3000 / (width - 1) )); fi
     seg=$(( scaled / 1000 )); t=$(( scaled % 1000 ))
     if (( seg > 2 )); then seg=2; t=1000; fi
+    # Ancora os quatro tons exatos da bandeira nas transições
+    if (( seg < 2 && t >= 970 )); then seg=$((seg + 1)); t=0; fi
+    if (( t <= 30 )); then t=0; fi
     RR[i]=$(( BR_R[seg] + (BR_R[seg+1] - BR_R[seg]) * t / 1000 ))
     GG[i]=$(( BR_G[seg] + (BR_G[seg+1] - BR_G[seg]) * t / 1000 ))
     BB[i]=$(( BR_B[seg] + (BR_B[seg+1] - BR_B[seg]) * t / 1000 ))

@@ -107,7 +107,7 @@ $SUDO chown "${FACTORY_USER}:${FACTORY_USER}" "${FACTORY_DIR}/scripts/setup-gnom
 if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
   bash "${FACTORY_DIR}/scripts/setup-gnome-folders.sh" >/dev/null 2>&1 || true
 fi
-$SUDO -u "$FACTORY_USER" env DISPLAY="${DISPLAY:-:0}" bash "${FACTORY_DIR}/scripts/setup-gnome-folders.sh" >/dev/null 2>&1 || true
+as_user "$FACTORY_USER" env DISPLAY="${DISPLAY:-:0}" bash "${FACTORY_DIR}/scripts/setup-gnome-folders.sh" >/dev/null 2>&1 || true
 chown -R "${FACTORY_USER}:${FACTORY_USER}" "$FACTORY_DIR" 2>/dev/null || true
 
 info "Para aplicar as pastas no GNOME do seu usuário, rode:"

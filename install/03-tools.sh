@@ -33,6 +33,14 @@ else
   fi
 fi
 
+if [ "$CI" = "1" ]; then
+  info "Modo CI: Docker validado; IDEs, runtimes e .debs externos são verificados pelo job 'links'."
+  section "Resumo das ferramentas (CI)"
+  ok "docker (instalação via repo oficial exercitada)"
+  info "Demais ferramentas: puladas em CI (URLs validadas no job 'links')."
+  exit 0
+fi
+
 # ------------------------------------------------------------ VS Code
 info "Instalando VS Code..."
 if has code; then

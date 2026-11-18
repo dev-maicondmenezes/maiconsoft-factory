@@ -110,6 +110,20 @@ Rode novamente quando quiser: `bash ~/factory/configure.sh`
 
 ---
 
+## 🧪 CI
+
+`.github/workflows/ci.yml` executa em **todo push e pull request para `main`** (e pode ser disparado manualmente):
+
+| Job | O que valida |
+|---|---|
+| `lint` | `bash -n`, ShellCheck, JSON, `scripts/validate-config.py`, YAML dos workflows, `docker compose config` em todos os perfis, permissões de execução, comando do one-liner, segredos fora do git e as 4 cores exatas do degradê da bandeira |
+| `links` | Disponibilidade das URLs externas usadas pelo instalador |
+| `integration-debian13` | Instalação real em container `debian:trixie` (modo `MAICONSOFT_CI=1`), com assertivas de usuário/grupos, diretórios, `.env`, atalhos `.desktop`, perfis e consistência da equipe do Paperclip |
+
+Validação local: `python3 scripts/validate-config.py` e `shellcheck -S warning $(find . -name '*.sh')`.
+
+---
+
 ## 🛠️ Comandos úteis
 
 ```bash

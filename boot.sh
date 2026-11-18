@@ -37,17 +37,27 @@ main() {
 
   for entry in "${STEPS[@]}"; do
     file="${entry%%|*}"; label="${entry#*|}"
+    CURRENT_STEP="$label"
     step "$label"
     bash "$HERE/install/$file"
     ok "$label — concluído."
   done
 
   section "Instalação concluída ✅"
+  if [ "$CI" = "1" ]; then
+    info "Modo CI: wizard interativo e stack Docker pulados (validados em outros jobs)."
+    bash "$HERE/scripts/healthcheck.sh" || true
+    return 0
+  fi
   info "Abrindo a configuração guiada pós-instalação..."
   printf "\n"
   bash "$HERE/configure.sh"
 }
 
-trap 'rc=$?; printf "\n${RED}❌ Falha na etapa: ${CURRENT_STEP:-início} (código $rc)${Z}\n" >&2' ERR
+on_error() {
+  local rc=$?
+  printf "\n${RED}❌ Falha na etapa: ${CURRENT_STEP:-início} (código ${rc})${Z}\n" >&2
+}
+trap on_error ERR
 CURRENT_STEP="início"
 main "$@"

@@ -1,0 +1,205 @@
+name: CI — Maiconsoft Factory
+
+# Executa sempre que a branch main sofre alterações (push, PR e disparo manual).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------- lint
+  lint:
+    name: Lint e validações estáticas
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sintaxe Bash (bash -n)
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=0
+          while IFS= read -r f; do
+            bash -n "$f"
+            count=$((count + 1))
+          done < <(find . -name '*.sh' -type f -not -path './.git/*' | sort)
+          echo "::notice::${count} scripts com sintaxe válida"
+
+      - name: ShellCheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+          find . -name '*.sh' -type f -not -path './.git/*' -print0 \
+            | xargs -0 shellcheck -S warning
+
+      - name: JSON e validações de consistência
+        run: |
+          python3 -m json.tool config/paperclip/team.json > /dev/null
+          python3 -m json.tool config/opencode/config.json > /dev/null
+          python3 scripts/validate-config.py
+
+      - name: YAML dos workflows
+        run: |
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          import glob, yaml
+          for path in glob.glob('.github/workflows/*.yml'):
+              with open(path, encoding='utf-8') as fh:
+                  yaml.safe_load(fh)
+              print('OK:', path)
+          PY
+
+      - name: docker compose config (todos os perfis)
+        env:
+          POSTGRES_PASSWORD: ci-test
+          LANGFUSE_NEXTAUTH_SECRET: ci-test
+          LANGFUSE_SALT: ci-test
+          LANGFUSE_ENCRYPTION_KEY: ci-test
+          N8N_ENCRYPTION_KEY: ci-test
+          GRAFANA_ADMIN_PASSWORD: ci-test
+          VAULTWARDEN_ADMIN_TOKEN: ci-test
+          KEYCLOAK_ADMIN_PASSWORD: ci-test
+        run: |
+          docker compose --profile core --profile data --profile intel \
+            --profile ops --profile sec --profile remote config -q
+          echo "::notice::docker-compose.yml válido em todos os perfis"
+
+      - name: Permissões de execução e one-liner
+        run: |
+          set -euo pipefail
+          for f in install.sh boot.sh configure.sh scripts/*.sh scripts/validate-config.py; do
+            test -x "$f" || { echo "Falta permissão de execução: $f"; exit 1; }
+          done
+          grep -Fq 'curl -fsSL https://raw.githubusercontent.com/dev-maicondmenezes/maiconsoft-factory/main/install.sh | bash' README.md
+          if grep -RqE '\| install([^a-zA-Z-]|$)' README.md install.sh; then
+            echo "ERRO: comando '| install' inválido encontrado"
+            exit 1
+          fi
+
+      - name: Segredos fora do git
+        run: |
+          set -euo pipefail
+          ! git ls-files --error-unmatch .env >/dev/null 2>&1
+          grep -qx '.env' .gitignore
+          grep -qx '!.env.example' .gitignore
+
+      - name: Banner com degradê da bandeira brasileira
+        run: |
+          bash -c 'source install/lib/ui.sh; factory_banner' > /tmp/banner.txt
+          grep -q $'\033[38;2;255;255;255m' /tmp/banner.txt   # branco
+          grep -q $'\033[38;2;255;223;0m' /tmp/banner.txt     # amarelo
+          grep -q $'\033[38;2;0;156;59m' /tmp/banner.txt      # verde
+          grep -q $'\033[38;2;0;39;118m' /tmp/banner.txt      # azul
+          grep -q 'MAICONSOFT\|███' /tmp/banner.txt
+          echo "::notice::Degradê branco → amarelo → verde → azul presente"
+
+      - name: Wizard e healthcheck executam sem erros de sintaxe em modo CI
+        env:
+          MAICONSOFT_CI: "1"
+          MAICONSOFT_FACTORY_DIR: ${{ github.workspace }}
+          MAICONSOFT_CONFIG_DIR: /tmp/maiconsoft-ci-config
+        run: |
+          mkdir -p "$MAICONSOFT_CONFIG_DIR"
+          printf 'core\n' > "$MAICONSOFT_CONFIG_DIR/profiles"
+          bash scripts/healthcheck.sh
+
+  # ------------------------------------------------------- links externos
+  links:
+    name: URLs externas usadas pelo instalador
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar disponibilidade
+        shell: bash
+        run: |
+          urls=(
+            "https://raw.githubusercontent.com/dev-maicondmenezes/maiconsoft-factory/main/install.sh"
+            "https://download.docker.com/linux/debian/gpg"
+            "https://cli.github.com/packages/githubcli-archive-keyring.gpg"
+            "https://deb.nodesource.com/setup_lts.x"
+            "https://go.dev/VERSION?m=text"
+            "https://opencode.ai/install"
+            "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+            "https://api.github.com/repos/PndaMan/cortex/releases/latest"
+            "https://ghcr.io/v2/"
+          )
+          status=0
+          for url in "${urls[@]}"; do
+            code="$(curl -sSL -o /dev/null -w '%{http_code}' --max-time 45 "$url" || true)"
+            printf '%s  %s\n' "$code" "$url"
+            case "$code" in
+              200|301|302|303|307|308) ;;
+              000|404) echo "::error::URL indisponível: $url ($code)"; status=1 ;;
+              *) echo "::warning::URL $url retornou $code" ;;
+            esac
+          done
+          exit "$status"
+
+  # ------------------------------------------- integração em Debian 13
+  integration-debian13:
+    name: Instalação em Debian 13 (Trixie)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    container:
+      image: debian:trixie
+      options: --privileged
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      MAICONSOFT_CI: "1"
+    steps:
+      - name: Preparar container Debian 13
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq ca-certificates curl git jq python3 file \
+            openssl util-linux sudo
+
+      - uses: actions/checkout@v4
+
+      - name: Rodar o bootstrap real (one-liner, repo local)
+        env:
+          MAICONSOFT_REPO_URL: file://${{ github.workspace }}
+        run: bash install.sh
+
+      - name: Assertivas pós-instalação
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "== usuário =="
+          id maiconsoft
+          id -nG maiconsoft | grep -qw sudo
+          id -nG maiconsoft | grep -qw docker
+
+          echo "== diretórios e arquivos versionados =="
+          test -d /home/maiconsoft/factory
+          test -d /home/maiconsoft/factory/projects
+          test -f /home/maiconsoft/factory/docker-compose.yml
+          test -f /home/maiconsoft/factory/README.md
+          test -f /home/maiconsoft/factory/.env
+          test -f /etc/profile.d/maiconsoft.sh
+          test -f /etc/maiconsoft/profiles
+          grep -qx 'core' /etc/maiconsoft/profiles
+          test "$(stat -c %a /home/maiconsoft/factory/.env)" = "600"
+          ! git -C /home/maiconsoft/factory ls-files --error-unmatch .env >/dev/null 2>&1
+
+          echo "== atalhos agrupados =="
+          count="$(find /usr/share/applications -maxdepth 1 -name 'maiconsoft-*.desktop' | wc -l)"
+          echo "atalhos: $count"
+          test "$count" -ge 15
+          test -f /usr/share/desktop-directories/Maiconsoft-AI.directory
+          test -f /etc/xdg/menus/applications-merged/maiconsoft.menu
+
+          echo "== configurações =="
+          python3 /home/maiconsoft/factory/scripts/validate-config.py
+
+          echo "::notice::Instalação validada em Debian 13 (Trixie)"

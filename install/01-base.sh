@@ -42,8 +42,8 @@ GIT_NAME="dev-maicondmenezes"
 GIT_EMAIL="dev-maicondmenezes@users.noreply.github.com"
 git config --global user.name "$GIT_NAME"
 git config --global user.email "$GIT_EMAIL"
-$SUDO -u "$FACTORY_USER" git config --global user.name "$GIT_NAME" 2>/dev/null || true
-$SUDO -u "$FACTORY_USER" git config --global user.email "$GIT_EMAIL" 2>/dev/null || true
+as_user "$FACTORY_USER" git config --global user.name "$GIT_NAME" 2>/dev/null || true
+as_user "$FACTORY_USER" git config --global user.email "$GIT_EMAIL" 2>/dev/null || true
 ok "Git configurado como ${GIT_NAME} <${GIT_EMAIL}>."
 
 # Diretório de configurações system-wide

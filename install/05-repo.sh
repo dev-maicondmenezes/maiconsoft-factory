@@ -50,7 +50,7 @@ if [ -f "${FACTORY_DIR}/config/opencode/config.json" ]; then
     [ -z "$u" ] && continue
     id -u "$u" >/dev/null 2>&1 || continue
     $SUDO install -d -m 0755 -o "$u" -g "$u" "/home/$u/.config/opencode" 2>/dev/null || true
-    $SUDO -u "$u" ln -sfn "${CONFIG_DIR}/opencode-config.json" "/home/$u/.config/opencode/config.json" 2>/dev/null || true
+    as_user "$u" ln -sfn "${CONFIG_DIR}/opencode-config.json" "/home/$u/.config/opencode/config.json" 2>/dev/null || true
   done
   ok "OpenCode apontando para http://localhost:20128/v1."
 fi

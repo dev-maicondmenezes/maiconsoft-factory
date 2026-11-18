@@ -43,7 +43,11 @@ done
 ok "Perfis ativos: $(tr '\n' ' ' < "$PROFILES_FILE")"
 if has docker && $SUDO docker info >/dev/null 2>&1; then
   info "Aplicando perfis (docker compose up -d)..."
-  ( cd "$FACTORY_DIR" && $SUDO docker compose $(for p in $(cat "$PROFILES_FILE"); do printf -- '--profile %s ' "$p"; done) up -d ) \
+  PROFILE_ARGS=()
+  while IFS= read -r p; do
+    [ -n "$p" ] && PROFILE_ARGS+=(--profile "$p")
+  done < "$PROFILES_FILE"
+  ( cd "$FACTORY_DIR" && $SUDO docker compose "${PROFILE_ARGS[@]}" up -d ) \
     || warn "Falha ao subir todos os perfis. Veja: cd ${FACTORY_DIR} && docker compose ps"
 fi
 pause

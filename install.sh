@@ -8,11 +8,12 @@
 # ============================================================
 set -Eeuo pipefail
 
-REPO_URL="https://github.com/dev-maicondmenezes/maiconsoft-factory.git"
+REPO_URL="${MAICONSOFT_REPO_URL:-https://github.com/dev-maicondmenezes/maiconsoft-factory.git}"
 FACTORY_USER="maiconsoft"
-FACTORY_DIR="/home/${FACTORY_USER}/factory"
+FACTORY_HOME="${MAICONSOFT_HOME:-/home/${FACTORY_USER}}"
+FACTORY_DIR="${MAICONSOFT_FACTORY_DIR:-${FACTORY_HOME}/factory}"
 
-C="\033[1;36m"; M="\033[1;35m"; G="\033[1;32m"; Y="\033[1;33m"
+C="\033[1;36m"; G="\033[1;32m"; Y="\033[1;33m"
 R="\033[1;31m"; B="\033[1m"; D="\033[2m"; Z="\033[0m"
 
 # Tons da bandeira brasileira (RGB): branco → amarelo → verde → azul
@@ -46,6 +47,9 @@ br_gradient_art() {
     if (( width <= 1 )); then scaled=0; else scaled=$(( i * 3000 / (width - 1) )); fi
     seg=$(( scaled / 1000 )); t=$(( scaled % 1000 ))
     if (( seg > 2 )); then seg=2; t=1000; fi
+    # Ancora os quatro tons exatos da bandeira nas transições
+    if (( seg < 2 && t >= 970 )); then seg=$((seg + 1)); t=0; fi
+    if (( t <= 30 )); then t=0; fi
     RR[i]=$(( BR_R[seg] + (BR_R[seg+1] - BR_R[seg]) * t / 1000 ))
     GG[i]=$(( BR_G[seg] + (BR_G[seg+1] - BR_G[seg]) * t / 1000 ))
     BB[i]=$(( BR_B[seg] + (BR_B[seg+1] - BR_B[seg]) * t / 1000 ))
@@ -133,11 +137,10 @@ else
   ok "Usuário '${FACTORY_USER}' já existia."
 fi
 $SUDO usermod -aG sudo,docker "$FACTORY_USER"
-$SUDO install -d -m 0755 -o "$FACTORY_USER" -g "$FACTORY_USER" "/home/${FACTORY_USER}"
+$SUDO install -d -m 0755 -o "$FACTORY_USER" -g "$FACTORY_USER" "$FACTORY_HOME"
 
-# Senha: só pede se houver terminal interativo
-if [ -t 0 ] && [ -z "$($SUDO passwd -S "$FACTORY_USER" 2>/dev/null | awk '{print $2}')" ]; then :; fi
-if [ -t 0 ]; then
+# Senha: só pede se houver terminal interativo (CI nunca é interativo)
+if [ -t 0 ] && [ "${MAICONSOFT_CI:-0}" != "1" ]; then
   passwd_state="$($SUDO passwd -S "$FACTORY_USER" 2>/dev/null | awk '{print $2}' || true)"
   if [ "$passwd_state" = "L" ] || [ "$passwd_state" = "NP" ] || [ -z "$passwd_state" ]; then
     printf "${Y}🔐 Defina a senha do usuário '${FACTORY_USER}' (Enter para deixar bloqueada e definir depois): ${Z}"

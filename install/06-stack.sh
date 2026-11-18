@@ -11,6 +11,11 @@ printf "core\n" | $SUDO tee "$PROFILES_FILE" >/dev/null
 $SUDO chmod 0644 "$PROFILES_FILE"
 ok "Perfis ativos: $($SUDO tr '\n' ' ' < "$PROFILES_FILE")"
 
+if [ "$CI" = "1" ]; then
+  info "Modo CI: compose validado no job 'lint'; pulando daemon, containers e downloads de modelos."
+  exit 0
+fi
+
 if ! has docker; then
   warn "Docker não encontrado — pulando a subida da stack."
   exit 0
