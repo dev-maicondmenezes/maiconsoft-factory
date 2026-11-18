@@ -1,0 +1,15 @@
+use_default_settings: true
+
+server:
+  secret_key: "maiconsoft-local-secret-change-me"
+  port: 8080
+  bind_address: "0.0.0.0"
+
+search:
+  safe_search: 0
+  autocomplete: "google"
+  default_language: "pt-BR"
+
+engines:
+  - name: wikipedia
+    language: pt-BR

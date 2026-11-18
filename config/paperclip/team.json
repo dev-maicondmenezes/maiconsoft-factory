@@ -1,0 +1,99 @@
+{
+  "company": {
+    "name": "Maiconsoft Factory",
+    "description": "Software house autônoma: engenharia, produto, design, infra, qualidade, segurança e crescimento.",
+    "budgetMonthlyCents": 150000
+  },
+  "agents": [
+    {
+      "shortname": "tech-lead",
+      "name": "Tech Lead",
+      "role": "ceo",
+      "title": "Tech Lead (modelo pesado)",
+      "model": "qwen2.5-coder:32b",
+      "capabilities": "Liderança técnica, arquitetura, decisões complexas, revisão final e delegação para a equipe.",
+      "reportsTo": null,
+      "budgetMonthlyCents": 30000
+    },
+    {
+      "shortname": "product-manager",
+      "name": "Product Manager",
+      "role": "manager",
+      "title": "Product Manager",
+      "model": "qwen2.5:7b",
+      "capabilities": "Descoberta de produto, priorização, roadmap, histórias de usuário e aceite com stakeholders.",
+      "reportsTo": "tech-lead",
+      "budgetMonthlyCents": 15000
+    },
+    {
+      "shortname": "architect",
+      "name": "Arquiteto",
+      "role": "engineer",
+      "title": "Arquiteto de Software",
+      "model": "qwen2.5-coder:7b",
+      "capabilities": "Design de sistemas, ADRs, contratos de API, limites de domínio e revisão de código estrutural.",
+      "reportsTo": "tech-lead",
+      "budgetMonthlyCents": 20000
+    },
+    {
+      "shortname": "dev-senior",
+      "name": "Dev Senior",
+      "role": "engineer",
+      "title": "Desenvolvedor Sênior (modelo coder)",
+      "model": "qwen2.5-coder:7b",
+      "capabilities": "Implementação full-stack, testes, refactoring e execução de tarefas com OpenCode.",
+      "reportsTo": "architect",
+      "budgetMonthlyCents": 25000
+    },
+    {
+      "shortname": "designer-uiux",
+      "name": "Designer UI/UX",
+      "role": "designer",
+      "title": "Designer UI/UX",
+      "model": "qwen2.5-vl:7b",
+      "capabilities": "Pesquisa com usuários, wireframes, design system, protótipos e revisão visual (modelo com visão).",
+      "reportsTo": "product-manager",
+      "budgetMonthlyCents": 12000
+    },
+    {
+      "shortname": "sre-devops",
+      "name": "SRE/DevOps",
+      "role": "engineer",
+      "title": "SRE/DevOps",
+      "model": "qwen2.5-coder:7b",
+      "capabilities": "CI/CD, Docker, observabilidade, capacidade, incidentes, backups e automação de infraestrutura.",
+      "reportsTo": "tech-lead",
+      "budgetMonthlyCents": 18000
+    },
+    {
+      "shortname": "qa",
+      "name": "QA",
+      "role": "engineer",
+      "title": "Engenheiro de Qualidade",
+      "model": "llama3.2:3b",
+      "capabilities": "Planos de teste, testes automatizados, regressão, relatórios de defeitos e critérios de aceite.",
+      "reportsTo": "tech-lead",
+      "budgetMonthlyCents": 10000
+    },
+    {
+      "shortname": "cybersecurity",
+      "name": "Especialista em CyberSec",
+      "role": "engineer",
+      "title": "Especialista em Cibersegurança",
+      "model": "qwen2.5-coder:7b",
+      "capabilities": "Ameaças, revisão de segurança, segredos, dependências vulneráveis, hardening e conformidade.",
+      "reportsTo": "tech-lead",
+      "budgetMonthlyCents": 15000
+    },
+    {
+      "shortname": "growth-marketing",
+      "name": "Growth/Marketing",
+      "role": "manager",
+      "title": "Growth & Marketing",
+      "model": "llama3.2:3b",
+      "capabilities": "Aquisição, retenção, funis, copywriting, métricas de crescimento e experimentos.",
+      "reportsTo": "product-manager",
+      "budgetMonthlyCents": 10000
+    }
+  ]
+}

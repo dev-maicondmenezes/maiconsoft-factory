@@ -1,0 +1,336 @@
+# ============================================================
+# Maiconsoft Factory — stack de serviços
+# Arquivo versionado: NÃO é criado pelo install.sh.
+#
+# Perfis:
+#   core   (padrão) Ollama, 9router, Paperclip, WebUI, Langfuse, n8n, Caddy
+#   data             Qdrant + Redis (RAG e cache)
+#   intel            SearXNG + Crawl4AI (busca/scraping)
+#   ops              Portainer + Prometheus + Grafana + Loki + cAdvisor
+#   sec              Vaultwarden + Keycloak
+#   remote           Tailscale
+#
+# Uso: docker compose --profile core --profile data up -d
+# ============================================================
+
+services:
+  # ---------------------------------------------------------- core
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "127.0.0.1:11434:11434"
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  9router:
+    image: ghcr.io/decolua/9router:latest
+    container_name: 9router
+    ports:
+      - "127.0.0.1:20128:20128"
+    volumes:
+      - 9router-data:/app/data
+    environment:
+      - DATA_DIR=/app/data
+    depends_on: [ollama]
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  paperclip:
+    image: ghcr.io/paperclipai/paperclip:latest
+    container_name: paperclip
+    ports:
+      - "127.0.0.1:3100:3100"
+    volumes:
+      - paperclip-data:/app/data
+    environment:
+      - OPENAI_API_BASE=http://9router:20128/v1
+      - OPENAI_API_KEY=maiconsoft-local
+      - PAPERCLIP_TOKEN=${PAPERCLIP_TOKEN:-}
+    depends_on: [9router]
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "127.0.0.1:3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OPENAI_API_BASE_URL=http://9router:20128/v1
+      - OPENAI_API_KEY=maiconsoft-local
+    volumes:
+      - open-webui-data:/app/backend/data
+    depends_on: [ollama]
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  langfuse-db:
+    image: postgres:16-alpine
+    container_name: langfuse-db
+    environment:
+      POSTGRES_USER: langfuse
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: langfuse
+    volumes:
+      - langfuse-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  langfuse:
+    image: ghcr.io/langfuse/langfuse:latest
+    container_name: langfuse
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      - DATABASE_URL=postgresql://langfuse:${POSTGRES_PASSWORD}@langfuse-db:5432/langfuse
+      - NEXTAUTH_SECRET=${LANGFUSE_NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=http://localhost:3001
+      - SALT=${LANGFUSE_SALT}
+      - ENCRYPTION_KEY=${LANGFUSE_ENCRYPTION_KEY}
+      - TELEMETRY_ENABLED=false
+    depends_on: [langfuse-db]
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  n8n-db:
+    image: postgres:16-alpine
+    container_name: n8n-db
+    environment:
+      POSTGRES_USER: n8n
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: n8n
+    volumes:
+      - n8n-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    ports:
+      - "127.0.0.1:5678:5678"
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=n8n-db
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+    volumes:
+      - n8n-data:/home/node/.n8n
+    depends_on: [n8n-db]
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    profiles: [core]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "127.0.0.1:2019:2019"
+    volumes:
+      - ./config/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  # ---------------------------------------------------------- data
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    profiles: [data]
+    ports:
+      - "127.0.0.1:6333:6333"
+      - "127.0.0.1:6334:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    profiles: [data]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  # ---------------------------------------------------------- intel
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    profiles: [intel]
+    ports:
+      - "127.0.0.1:8888:8080"
+    volumes:
+      - ./config/searxng:/etc/searxng:rw
+      - searxng-data:/var/cache/searxng
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8888/
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  crawl4ai:
+    image: unclecode/crawl4ai:latest
+    container_name: crawl4ai
+    profiles: [intel]
+    ports:
+      - "127.0.0.1:11235:11235"
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  # ---------------------------------------------------------- ops
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    profiles: [ops]
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-data:/data
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    profiles: [ops]
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    profiles: [ops]
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    depends_on: [cadvisor]
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  loki:
+    image: grafana/loki:2.9.8
+    container_name: loki
+    profiles: [ops]
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "127.0.0.1:3101:3100"
+    volumes:
+      - loki-data:/loki
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    profiles: [ops]
+    ports:
+      - "127.0.0.1:3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on: [prometheus, loki]
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  # ---------------------------------------------------------- sec
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    profiles: [sec]
+    ports:
+      - "127.0.0.1:8222:80"
+    environment:
+      - ADMIN_TOKEN=${VAULTWARDEN_ADMIN_TOKEN}
+      - SIGNUPS_ALLOWED=true
+      - WEB_VAULT_ENABLED=true
+    volumes:
+      - vaultwarden-data:/data
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    profiles: [sec]
+    command: start-dev
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_HTTP_ENABLED=true
+      - KC_HOSTNAME_STRICT=false
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+  # ---------------------------------------------------------- remote
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    profiles: [remote]
+    hostname: maiconsoft-factory
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY:-}
+      - TS_HOSTNAME=maiconsoft-factory
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - tailscale-data:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    restart: unless-stopped
+    networks: [maiconsoft-net]
+
+networks:
+  maiconsoft-net:
+    driver: bridge
+
+volumes:
+  ollama:
+  9router-data:
+  paperclip-data:
+  open-webui-data:
+  langfuse-db-data:
+  n8n-db-data:
+  n8n-data:
+  caddy-data:
+  caddy-config:
+  qdrant-data:
+  redis-data:
+  searxng-data:
+  portainer-data:
+  prometheus-data:
+  loki-data:
+  grafana-data:
+  vaultwarden-data:
+  keycloak-data:
+  tailscale-data:

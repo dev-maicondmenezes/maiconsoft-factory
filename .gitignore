@@ -1,0 +1,20 @@
+# Segredos — NUNCA versionar
+.env
+.env.*
+!.env.example
+
+# Dados locais e volumes
+9router-data/
+*.log
+*.tar.gz
+*.deb
+__pycache__/
+*.pyc
+
+# Projetos clonados pelo wizard (não fazem parte desta factory)
+projects/
+
+# Arquivos de sistema/editor
+.DS_Store
+.idea/
+.vscode/

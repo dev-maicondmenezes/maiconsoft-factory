@@ -1,0 +1,55 @@
+{
+  local_certs
+  email admin@maiconsoft.local
+}
+
+# Todos os serviços ficam em 127.0.0.1 no host; o Caddy é a única
+# porta exposta na LAN (80/443) e resolve nomes *.maiconsoft.local via Avahi.
+(proxy) {
+  tls internal
+  reverse_proxy host.docker.internal:{args[0]}
+}
+
+paperclip.maiconsoft.local, factory.maiconsoft.local {
+  import proxy 3100
+}
+
+router.maiconsoft.local {
+  import proxy 20128
+}
+
+chat.maiconsoft.local {
+  import proxy 3000
+}
+
+langfuse.maiconsoft.local {
+  import proxy 3001
+}
+
+n8n.maiconsoft.local {
+  import proxy 5678
+}
+
+portainer.maiconsoft.local {
+  import proxy 9000
+}
+
+grafana.maiconsoft.local {
+  import proxy 3002
+}
+
+vault.maiconsoft.local {
+  import proxy 8222
+}
+
+sso.maiconsoft.local {
+  import proxy 8080
+}
+
+search.maiconsoft.local {
+  import proxy 8888
+}
+
+qdrant.maiconsoft.local {
+  import proxy 6333
+}

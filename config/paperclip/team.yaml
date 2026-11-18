@@ -1,0 +1,59 @@
+# Documentação legível da equipe Maiconsoft Factory.
+# Fonte machine-readable usada pelo bootstrap: config/paperclip/team.json
+company:
+  name: Maiconsoft Factory
+  description: Software house autônoma com engenharia, produto, design, infra, qualidade, segurança e crescimento.
+  budgetMonthlyCents: 150000
+
+org:
+  # Papel / modelo / gestor
+  - shortname: tech-lead
+    name: Tech Lead
+    role: ceo
+    model: qwen2.5-coder:32b        # modelo pesado para tarefas complexas
+    reportsTo: null
+  - shortname: product-manager
+    name: Product Manager
+    role: manager
+    model: qwen2.5:7b
+    reportsTo: tech-lead
+  - shortname: architect
+    name: Arquiteto
+    role: engineer
+    model: qwen2.5-coder:7b
+    reportsTo: tech-lead
+  - shortname: dev-senior
+    name: Dev Senior
+    role: engineer
+    model: qwen2.5-coder:7b         # modelo coder
+    reportsTo: architect
+  - shortname: designer-uiux
+    name: Designer UI/UX
+    role: designer
+    model: qwen2.5-vl:7b            # modelo com visão
+    reportsTo: product-manager
+  - shortname: sre-devops
+    name: SRE/DevOps
+    role: engineer
+    model: qwen2.5-coder:7b
+    reportsTo: tech-lead
+  - shortname: qa
+    name: QA
+    role: engineer
+    model: llama3.2:3b
+    reportsTo: tech-lead
+  - shortname: cybersecurity
+    name: Especialista em CyberSec
+    role: engineer
+    model: qwen2.5-coder:7b
+    reportsTo: tech-lead
+  - shortname: growth-marketing
+    name: Growth/Marketing
+    role: manager
+    model: llama3.2:3b
+    reportsTo: product-manager
+
+notas:
+  - "Modelos são resolvidos pelo 9router (OPENAI_API_BASE no container paperclip)."
+  - "qwen2.5-coder:32b precisa ser baixado no Ollama: docker exec ollama ollama pull qwen2.5-coder:32b"
+  - "Logins OAuth (Google/Antigravity, Anthropic) são feitos na fase guiada configure.sh."
