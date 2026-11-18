@@ -12,7 +12,7 @@ $SUDO usermod -aG sudo,docker "$FACTORY_USER"
 
 # Se o usuário que executou o installer for diferente do maiconsoft,
 # dá a ele acesso ao docker também (para 'docker compose' funcionar na sessão).
-CURRENT_USER="${SUDO_USER:-$USER}"
+CURRENT_USER="${SUDO_USER:-${USER:-}}"
 if [ -n "${CURRENT_USER:-}" ] && [ "$CURRENT_USER" != "root" ] && [ "$CURRENT_USER" != "$FACTORY_USER" ]; then
   $SUDO usermod -aG docker "$CURRENT_USER" 2>/dev/null || true
 fi

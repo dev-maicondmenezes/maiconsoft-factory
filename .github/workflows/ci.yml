@@ -101,7 +101,7 @@ jobs:
           grep -qF $'\033[38;2;0;156;59m' /tmp/banner.txt      # verde
           grep -qF $'\033[38;2;0;39;118m' /tmp/banner.txt      # azul
           grep -qF 'Software house autônoma' /tmp/banner.txt
-          test "$(grep -cF '38;2;' /tmp/banner.txt)" -gt 100
+          test "$(grep -oF '38;2;' /tmp/banner.txt | wc -l)" -gt 100
           echo "::notice::Degradê branco → amarelo → verde → azul presente"
 
       - name: Wizard e healthcheck executam sem erros de sintaxe em modo CI

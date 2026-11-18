@@ -28,7 +28,7 @@ step() {
 ask_yes_no() {
   local prompt="$1" answer
   read -r -p "${Y}❓ ${prompt} [s/N] ${Z}" answer || true
-  [[ "$answer" =~ ^[sS]$ ]]
+  [[ "${answer:-}" =~ ^[sS]$ ]]
 }
 
 # whiptail com fallback para leitura simples
@@ -40,7 +40,7 @@ choose_checklist() {
     info "$text"
     printf '%s\n' "${@:3}" | sed 's/"$//' >&2
     read -r -p "${Y}Digite os itens desejados (separados por espaço) ou Enter para pular: ${Z}" REPLY || true
-    printf '%s' "$REPLY"
+    printf '%s' "${REPLY:-}"
   fi
 }
 
