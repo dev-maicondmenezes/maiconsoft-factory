@@ -2,7 +2,7 @@
 # Repositório versionado, .env com segredos e configurações compartilhadas.
 # ATENÇÃO: este script NÃO cria README.md nem docker-compose.yml — eles vêm do git.
 set -Eeuo pipefail
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HERE/lib/common.sh"
 
 require_repo_file docker-compose.yml

@@ -2,7 +2,7 @@
 # Cria a empresa "Maiconsoft Factory" e contrata os 9 agentes via API do Paperclip.
 # Idempotente: nunca duplica empresa nem agentes.
 set -Eeuo pipefail
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HERE/lib/common.sh"
 
 TEAM_FILE="${FACTORY_DIR}/config/paperclip/team.json"

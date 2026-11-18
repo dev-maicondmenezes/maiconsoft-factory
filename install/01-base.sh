@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Base APT: tudo o que o resto do installer e o dia a dia precisam.
 set -Eeuo pipefail
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HERE/lib/common.sh"
 
 info "Atualizando índices APT e instalando a base..."

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Ferramentas de desenvolvimento — todas instaladas system-wide.
 set -Eeuo pipefail
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HERE/lib/common.sh"
 
 INSTALLED=(); SKIPPED=(); FAILED=()

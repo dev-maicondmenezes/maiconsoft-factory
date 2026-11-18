@@ -2,7 +2,7 @@
 # Atalhos agrupados por categoria no "Pesquisar aplicativos" do Debian/GNOME.
 # Os .desktop ficam em /usr/share/applications (system-wide, para todos os usuários).
 set -Eeuo pipefail
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HERE/lib/common.sh"
 
 DESKTOP_DIR="/usr/share/applications"

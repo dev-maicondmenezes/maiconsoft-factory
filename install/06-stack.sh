@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Sobe o perfil core, baixa modelos locais e deixa os serviços prontos.
 set -Eeuo pipefail
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HERE/lib/common.sh"
 
 require_repo_file docker-compose.yml

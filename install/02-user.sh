@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Usuário maiconsoft, diretórios e variáveis de ambiente globais.
 set -Eeuo pipefail
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HERE/lib/common.sh"
 
 info "Garantindo grupos sudo/docker..."
