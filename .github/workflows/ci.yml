@@ -98,16 +98,17 @@ jobs:
           grep -qx '.env' .gitignore
           grep -qx '!.env.example' .gitignore
 
-      - name: Banner com degradê da bandeira brasileira
+      - name: Banner Maiconsoft© com degradê vertical da bandeira
         run: |
           bash -c 'source install/lib/ui.sh; factory_banner' > /tmp/banner.txt
+          grep -qF 'Maiconsoft©' /tmp/banner.txt
           grep -qF $'\033[38;2;255;255;255m' /tmp/banner.txt   # branco
           grep -qF $'\033[38;2;255;223;0m' /tmp/banner.txt     # amarelo
           grep -qF $'\033[38;2;0;156;59m' /tmp/banner.txt      # verde
           grep -qF $'\033[38;2;0;39;118m' /tmp/banner.txt      # azul
-          grep -qF 'Software house autônoma' /tmp/banner.txt
-          test "$(grep -oF '38;2;' /tmp/banner.txt | wc -l)" -gt 100
-          echo "::notice::Degradê branco → amarelo → verde → azul presente"
+          head -1 /tmp/banner.txt | grep -qF $'\033[38;2;255;255;255m'  # topo branco
+          sed -n '5p' /tmp/banner.txt | grep -qF $'\033[38;2;0;39;118m' # base azul
+          echo "::notice::Maiconsoft© com degradê vertical branco → azul presente"
 
       - name: Wizard e healthcheck executam sem erros de sintaxe em modo CI
         env:

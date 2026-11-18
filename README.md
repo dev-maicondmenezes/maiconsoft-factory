@@ -6,7 +6,7 @@
 
 `Debian 13 (Trixie)` · `IA local` · `9 agentes orquestrados` · `rede local via mDNS`
 
-> 🇧🇷 A arte ASCII do nome recebe um **degradê horizontal branco → amarelo → verde → azul**, nos tons da bandeira brasileira (RGB `#FFFFFF`, `#FFDF00`, `#009C3B`, `#002776`).
+> 🇧🇷 A arte ASCII exibe **Maiconsoft©** (com o símbolo de corporation sobrescrito) e recebe um **degradê vertical** — branco → amarelo → verde → azul, de cima para baixo, nos tons da bandeira brasileira (RGB `#FFFFFF`, `#FFDF00`, `#009C3B`, `#002776`).
 
 </div>
 
