@@ -52,7 +52,7 @@ ensure_line() {
 # Executa apt-get install tolerando pacotes inexistentes em uma distro específica
 apt_install() {
   $SUDO apt-get update -qq
-  $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$@"
+  $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$@"
 }
 
 # Garante que um arquivo do repo existe (o script NUNCA cria README/compose)

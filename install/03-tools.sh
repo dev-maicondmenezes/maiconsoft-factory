@@ -24,7 +24,7 @@ else
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${CODENAME} stable" \
     | $SUDO tee /etc/apt/sources.list.d/docker.list >/dev/null
   $SUDO apt-get update -qq
-  if $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin >/dev/null; then
+  if $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin >/dev/null; then
     $SUDO groupadd -f docker
     $SUDO usermod -aG docker "$FACTORY_USER"
     mark_ok docker
@@ -47,7 +47,7 @@ if has code; then
   mark_skip vscode
 elif wget -q -O /tmp/vscode.deb "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"; then
   if file /tmp/vscode.deb | grep -qi 'Debian'; then
-    if $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq /tmp/vscode.deb >/dev/null; then mark_ok vscode; else mark_fail vscode; fi
+    if $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq /tmp/vscode.deb >/dev/null; then mark_ok vscode; else mark_fail vscode; fi
   else
     mark_fail vscode
   fi
@@ -100,7 +100,7 @@ else
     "https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-amd64.deb" \
     "https://github.com/sst/opencode/releases/latest/download/opencode-desktop-linux-amd64.deb"; do
     if wget -q -O /tmp/opencode-ui.deb "$URL" && file /tmp/opencode-ui.deb | grep -qi 'Debian'; then
-      if $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq /tmp/opencode-ui.deb >/dev/null; then UI_OK=1; break; fi
+      if $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq /tmp/opencode-ui.deb >/dev/null; then UI_OK=1; break; fi
     fi
   done
   rm -f /tmp/opencode-ui.deb
@@ -127,7 +127,7 @@ info "Instalando Node.js LTS..."
 if has node && has npm; then
   mark_skip node
 elif curl -fsSL https://deb.nodesource.com/setup_lts.x | $SUDO -E bash - >/dev/null 2>&1 && \
-     $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq nodejs >/dev/null; then
+     $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq nodejs >/dev/null; then
   mark_ok node
 else
   mark_fail node
@@ -144,7 +144,7 @@ else
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
     | $SUDO tee /etc/apt/sources.list.d/github-cli.list >/dev/null
   $SUDO apt-get update -qq
-  if $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq gh >/dev/null; then mark_ok gh; else mark_fail gh; fi
+  if $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq gh >/dev/null; then mark_ok gh; else mark_fail gh; fi
 fi
 
 # ------------------------------------------------------------ Cortex
@@ -155,7 +155,7 @@ else
   CORTEX_URL=$(curl -fsSL https://api.github.com/repos/PndaMan/cortex/releases/latest 2>/dev/null \
     | jq -r '.assets[] | select(.name | endswith(".deb")) | .browser_download_url' | head -1)
   if [ -n "$CORTEX_URL" ] && [ "$CORTEX_URL" != "null" ] && wget -q -O /tmp/cortex.deb "$CORTEX_URL"; then
-    if $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq /tmp/cortex.deb >/dev/null; then mark_ok cortex; else mark_fail cortex; fi
+    if $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq /tmp/cortex.deb >/dev/null; then mark_ok cortex; else mark_fail cortex; fi
     rm -f /tmp/cortex.deb
   else
     mark_fail cortex

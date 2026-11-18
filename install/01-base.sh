@@ -20,13 +20,13 @@ OPCIONAIS=(
 )
 
 $SUDO apt-get update -qq
-$SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "${ESSENCIAL[@]}" >/dev/null
+$SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "${ESSENCIAL[@]}" >/dev/null
 ok "Pacotes essenciais instalados."
 
 # Pacotes opcionais: falha de um não aborta a instalação
 for pkg in "${OPCIONAIS[@]}"; do
   if ! pkg_installed "$pkg" && ! has "$pkg"; then
-    $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$pkg" >/dev/null 2>&1 || \
+    $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$pkg" >/dev/null 2>&1 || \
       warn "Pacote opcional indisponível nesta versão: $pkg"
   fi
 done

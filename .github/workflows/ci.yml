@@ -96,10 +96,10 @@ jobs:
       - name: Banner com degradê da bandeira brasileira
         run: |
           bash -c 'source install/lib/ui.sh; factory_banner' > /tmp/banner.txt
-          grep -q $'\033[38;2;255;255;255m' /tmp/banner.txt   # branco
-          grep -q $'\033[38;2;255;223;0m' /tmp/banner.txt     # amarelo
-          grep -q $'\033[38;2;0;156;59m' /tmp/banner.txt      # verde
-          grep -q $'\033[38;2;0;39;118m' /tmp/banner.txt      # azul
+          grep -qF $'\033[38;2;255;255;255m' /tmp/banner.txt   # branco
+          grep -qF $'\033[38;2;255;223;0m' /tmp/banner.txt     # amarelo
+          grep -qF $'\033[38;2;0;156;59m' /tmp/banner.txt      # verde
+          grep -qF $'\033[38;2;0;39;118m' /tmp/banner.txt      # azul
           grep -qF 'Software house autônoma' /tmp/banner.txt
           test "$(grep -cF '38;2;' /tmp/banner.txt)" -gt 100
           echo "::notice::Degradê branco → amarelo → verde → azul presente"
