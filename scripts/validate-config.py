@@ -115,6 +115,9 @@ def validate_required_files() -> None:
         "config/opencode/config.json", "config/caddy/Caddyfile",
         "config/prometheus/prometheus.yml", "config/searxng/settings.yml",
         "install/lib/ui.sh", "install/lib/common.sh",
+        "install/08-wallpaper.sh",
+        "assets/wallpapers/maiconsoft_bg_ligth.jpeg",
+        "assets/wallpapers/maiconsoft_bg_dark.png",
         "scripts/healthcheck.sh", "scripts/gh-clone-repos.sh",
         "scripts/setup-gnome-folders.sh", "scripts/validate-config.py",
         ".github/workflows/ci.yml", ".github/workflows/secret-scan.yml",
@@ -129,6 +132,21 @@ def validate_required_files() -> None:
     ]
     for rel in executables:
         check(bool((ROOT / rel).stat().st_mode & 0o111), f"{rel} é executável")
+
+
+def validate_wallpapers() -> None:
+    section("Wallpapers da Maiconsoft")
+    light = ROOT / "assets/wallpapers/maiconsoft_bg_ligth.jpeg"
+    dark = ROOT / "assets/wallpapers/maiconsoft_bg_dark.png"
+    if light.is_file():
+        check(light.read_bytes()[:2] == b"\xff\xd8", "wallpaper claro é JPEG válido")
+    if dark.is_file():
+        check(dark.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n", "wallpaper escuro é PNG válido")
+    script = read("install/08-wallpaper.sh")
+    check("maiconsoft_bg_ligth.jpeg" in script and "maiconsoft_bg_dark.png" in script,
+          "instalador copia as duas imagens")
+    check("picture-uri-dark" in script and "Pictures" in script,
+          "instalador define o fundo escuro via gsettings")
 
 
 def validate_installer_is_not_a_generator() -> None:
@@ -227,6 +245,7 @@ def main() -> int:
     validate_team()
     if not args.team_only:
         validate_required_files()
+        validate_wallpapers()
         validate_installer_is_not_a_generator()
         validate_secrets()
         validate_compose()

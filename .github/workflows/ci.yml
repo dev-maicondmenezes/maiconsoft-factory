@@ -86,6 +86,11 @@ jobs:
             exit 1
           fi
 
+      - name: Wallpapers versionados
+        run: |
+          file assets/wallpapers/maiconsoft_bg_ligth.jpeg | grep -q 'JPEG image data'
+          file assets/wallpapers/maiconsoft_bg_dark.png | grep -q 'PNG image data'
+
       - name: Segredos fora do git
         run: |
           set -euo pipefail
@@ -195,6 +200,10 @@ jobs:
           test -f /etc/profile.d/maiconsoft.sh
           test -f /etc/maiconsoft/profiles
           grep -qx 'core' /etc/maiconsoft/profiles
+          echo "== wallpapers =="
+          test -f /home/maiconsoft/Pictures/maiconsoft_bg_ligth.jpeg
+          test -f /home/maiconsoft/Pictures/maiconsoft_bg_dark.png
+          test -f /home/maiconsoft/.local/share/backgrounds/maiconsoft_bg_dark.png
           test "$(stat -c %a /home/maiconsoft/factory/.env)" = "600"
           ! git -C /home/maiconsoft/factory ls-files --error-unmatch .env >/dev/null 2>&1
 

@@ -33,6 +33,7 @@ O instalador é **idempotente**: rodá-lo de novo atualiza o clone via `git pull
 | `/etc/maiconsoft` | configurações system-wide (PATH, OpenCode, perfis) |
 | `/usr/share/applications` | atalhos com o prefixo `Maiconsoft ·` |
 | `/etc/profile.d/maiconsoft.sh` | PATH disponível para todos os usuários com sudo |
+| `assets/wallpapers/` | wallpapers claro (JPEG) e escuro (PNG) versionados |
 
 > O `install.sh` **não cria** `README.md` nem `docker-compose.yml` — ambos são versionados neste repositório e apenas consumidos pelo instalador.
 
@@ -50,6 +51,15 @@ O instalador é **idempotente**: rodá-lo de novo atualiza o clone via `git pull
   - Maiconsoft · Segurança
   - Maiconsoft · Conhecimento
 - Para ativar as **pastas** no GNOME 42+: `bash ~/factory/scripts/setup-gnome-folders.sh`
+
+### 🖼️ Wallpapers
+
+As duas imagens versionadas em `assets/wallpapers/` são copiadas na instalação para:
+
+- `~/Pictures/` (pasta padrão de imagens do usuário `maiconsoft`)
+- `~/.local/share/backgrounds/` (local padrão do GNOME para fundos)
+
+A versão **escura** (`maiconsoft_bg_dark.png`) é definida como fundo do `maiconsoft` via `gsettings` (`picture-uri`, `picture-uri-dark` e `picture-options=zoom`). A versão clara fica disponível em `~/Pictures/` para troca manual.
 
 ---
 
@@ -144,7 +154,8 @@ git pull                                # atualizar a factory
 ```
 install.sh                 bootstrap do one-liner
 boot.sh                    orquestrador
-install/00..07             módulos da instalação
+install/00..08             módulos da instalação (08 = wallpapers)
+assets/wallpapers/         fundos claro/escuro versionados
 install/lib/               UI (ASCII/ANSI/emoji) e helpers
 configure.sh               wizard pós-instalação
 config/{paperclip,opencode,caddy,prometheus,searxng}

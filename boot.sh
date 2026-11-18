@@ -22,6 +22,7 @@ STEPS=(
   "05-repo.sh|Repositório, .env e configurações"
   "06-stack.sh|Stack Docker (perfil core) e modelos Ollama"
   "07-paperclip.sh|Empresa e equipe de 9 agentes no Paperclip"
+  "08-wallpaper.sh|Wallpapers e fundo escuro do usuário maiconsoft"
 )
 
 main() {
