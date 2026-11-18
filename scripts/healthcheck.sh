@@ -13,7 +13,8 @@ check() {
 section "🩺 Healthcheck — Maiconsoft Factory"
 
 check "Usuário maiconsoft existe"          id -u "$FACTORY_USER"
-check "Grupo sudo"                          id -nG "$FACTORY_USER"
+check "Grupo sudo"                          bash -c "id -nG '$FACTORY_USER' | tr ' ' '\n' | grep -qx sudo"
+check "Grupo docker"                        bash -c "id -nG '$FACTORY_USER' | tr ' ' '\n' | grep -qx docker"
 check "Diretório factory existe"            test -d "$FACTORY_DIR"
 check "docker-compose.yml versionado"       test -f "$COMPOSE_FILE"
 check "README.md versionado"                test -f "${FACTORY_DIR}/README.md"
