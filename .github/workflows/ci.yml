@@ -108,7 +108,8 @@ jobs:
           grep -qF $'\033[38;2;0;39;118m' /tmp/banner.txt      # azul
           head -1 /tmp/banner.txt | grep -qF $'\033[38;2;255;255;255m'  # topo branco
           head -1 /tmp/banner.txt | grep -qF '©'                       # © sobrescrito real
-          sed -n '12p' /tmp/banner.txt | grep -qF $'\033[38;2;0;39;118m' # base azul
+          last_art="$(grep -nF '38;2;' /tmp/banner.txt | tail -1 | cut -d: -f1)"
+          sed -n "${last_art}p" /tmp/banner.txt | grep -qF $'\033[38;2;0;39;118m' # base azul
           grep -qF '\033[2J\033[H\033[3J' install.sh install/lib/ui.sh   # limpeza de tela
           grep -qE '^[[:space:]]*clear_screen$' boot.sh
           echo "::notice::Maiconsoft© com degradê vertical e limpeza de tela presentes"

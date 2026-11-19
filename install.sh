@@ -27,6 +27,10 @@ br_gradient_art() {
   local -a lines=()
   local line
   while IFS= read -r line; do lines+=("$line"); done <<< "$art"
+  # Ignora linhas em branco no fim: o azul deve pintar a última linha VISÍVEL.
+  while (( ${#lines[@]} > 0 )) && [ -z "${lines[${#lines[@]}-1]}" ]; do
+    unset 'lines[-1]'
+  done
   local n=${#lines[@]} i idx
   for ((i=0; i<n; i++)); do
     if (( n <= 1 )); then idx=0; else idx=$(( i * (${#BR_ROWS_R[@]} - 1) / (n - 1) )); fi
