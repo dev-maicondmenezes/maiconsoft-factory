@@ -76,10 +76,13 @@ $SUDO install -m 0644 /tmp/ms-avahi /etc/avahi/hosts
 rm -f /tmp/ms-avahi
 
 # Resolução imediata no próprio host (mDNS pode não estar ativo na sessão).
-$SUDO sed -i '/\.maiconsoft\.local/d' /etc/hosts
+# Não usa 'sed -i': /etc/hosts pode ser um bind mount (ex.: containers/CI).
+$SUDO awk '!/\.maiconsoft\.local/' /etc/hosts > /tmp/ms-hosts
 for host in "${HOSTS[@]}"; do
-  echo "${LAN_IP} ${host}.maiconsoft.local" | $SUDO tee -a /etc/hosts >/dev/null
+  echo "${LAN_IP} ${host}.maiconsoft.local" >> /tmp/ms-hosts
 done
+$SUDO tee /etc/hosts < /tmp/ms-hosts >/dev/null
+rm -f /tmp/ms-hosts
 
 $SUDO systemctl enable --now avahi-daemon >/dev/null 2>&1 || true
 $SUDO systemctl restart avahi-daemon >/dev/null 2>&1 || true
