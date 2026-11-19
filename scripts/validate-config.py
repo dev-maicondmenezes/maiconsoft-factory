@@ -240,6 +240,27 @@ def validate_dns_consistency() -> None:
           "bootstrap atualiza o clone mesmo com propriedade diferente (safe.directory + reset)")
 
 
+def validate_hub() -> None:
+    section("Hub web (assets/hub)")
+    index = ROOT / "assets/hub/index.html"
+    check(index.is_file(), "assets/hub/index.html existe")
+    if not index.is_file():
+        return
+    html = read("assets/hub/index.html")
+    caddy = read("config/caddy/Caddyfile")
+    compose = read("docker-compose.yml")
+    linked = set(re.findall(r"http://([a-z0-9-]+\.maiconsoft\.local)", html))
+    sem_rota = sorted(h for h in linked if h not in caddy)
+    check(bool(linked) and not sem_rota,
+          f"todos os links do hub têm rota no Caddy (faltam: {sem_rota or 'nenhum'})")
+    icons = set(re.findall(r"icons/([^\"]+)", html))
+    faltando = sorted(i for i in icons if not (ROOT / "assets/hub/icons" / i).is_file())
+    check(bool(icons) and not faltando,
+          f"ícones de todas as ferramentas presentes (faltam: {faltando or 'nenhum'})")
+    check("root * /srv/hub" in caddy and "./assets/hub:/srv/hub:ro" in compose,
+          "hub servido pelo próprio Caddy do compose")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--team-only", action="store_true")
@@ -254,6 +275,7 @@ def main() -> int:
         validate_secrets()
         validate_compose()
         validate_dns_consistency()
+        validate_hub()
 
     if ERRORS:
         print(f"\n❌ {len(ERRORS)} validação(ões) falharam:")

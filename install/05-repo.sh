@@ -64,7 +64,7 @@ if [ "$LAN_IP" = "127.0.0.1" ]; then
   warn "IP da LAN não detectado; nomes funcionarão apenas localmente."
 fi
 
-HOSTS=(paperclip chat router langfuse n8n portainer grafana vault sso search qdrant factory)
+HOSTS=(hub paperclip chat router langfuse n8n ollama portainer grafana prometheus loki qdrant search vault sso factory)
 
 cat > /tmp/ms-avahi <<EOF
 # Maiconsoft Factory — gerado por install/05-repo.sh

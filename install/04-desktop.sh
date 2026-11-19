@@ -73,6 +73,7 @@ keycloak|Keycloak|SSO e identidade centralizada|xdg-open http://sso.maiconsoft.l
 searxng|SearXNG|Busca privada para agentes e pessoas|xdg-open http://search.maiconsoft.local|applications-internet|Learn|false
 cortex|Cortex|Study OS de economia|cortex|applications-education|Learn|false
 healthcheck|Healthcheck|Verificar saúde da factory|${FACTORY_DIR}/scripts/healthcheck.sh|utilities-terminal|Ops|true
+hub|Hub de Serviços|Painel web das ferramentas da factory|xdg-open http://hub.maiconsoft.local|applications-internet|Ops|false
 APPS
 rm -f /tmp/ms-desktop
 ok "Atalhos instalados em ${DESKTOP_DIR}."

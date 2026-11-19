@@ -85,6 +85,10 @@ Todos os serviços ficam em `127.0.0.1`. O **Caddy** é o único exposto na LAN,
 
 > 💡 Como o instalador é usado via `curl … | bash`, o stdin é o pipe do script. Os prompts interativos (senha, perfis, seleção de repositórios) leem de `/dev/tty`, então o wizard funciona normalmente mesmo nesse formato.
 
+### 🧭 Hub web
+
+**http://hub.maiconsoft.local** é uma página estática com um cartão e o ícone oficial de cada ferramenta acessível via web (Paperclip, 9router, Open WebUI, Langfuse, n8n, Ollama, Portainer, Grafana, Prometheus, Loki, Qdrant, SearXNG, Vaultwarden e Keycloak). Ela é servida pelo **próprio Caddy do compose** (montando `assets/hub` em `/srv/hub`), sem container adicional, e também ganha um atalho `Maiconsoft · Hub de Serviços` no menu do Debian.
+
 ---
 
 ## 🤖 Equipe Paperclip
@@ -160,6 +164,7 @@ install.sh                 bootstrap do one-liner
 boot.sh                    orquestrador
 install/00..08             módulos da instalação (08 = wallpapers)
 assets/wallpapers/         fundos claro/escuro versionados
+assets/hub/                página e ícones do hub web (servida pelo Caddy)
 install/lib/               UI (ASCII/ANSI/emoji) e helpers
 configure.sh               wizard pós-instalação
 config/{paperclip,opencode,caddy,prometheus,searxng}

@@ -209,6 +209,8 @@ jobs:
           echo "== dns .local =="
           ! grep -q '^127\.0\.0\.1.*maiconsoft\.local' /etc/avahi/hosts
           grep -q 'maiconsoft\.local' /etc/hosts
+          grep -q 'hub.maiconsoft.local' /etc/hosts
+          test -f /home/maiconsoft/factory/assets/hub/index.html
           echo "== wallpapers =="
           test -f /home/maiconsoft/Pictures/maiconsoft_bg_ligth.jpeg
           test -f /home/maiconsoft/Pictures/maiconsoft_bg_dark.png

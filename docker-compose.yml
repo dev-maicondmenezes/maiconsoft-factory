@@ -137,6 +137,7 @@ services:
       - "127.0.0.1:2019:2019"
     volumes:
       - ./config/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./assets/hub:/srv/hub:ro
       - caddy-data:/data
       - caddy-config:/config
     extra_hosts:

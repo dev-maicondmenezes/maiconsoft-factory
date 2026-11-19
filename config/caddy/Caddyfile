@@ -53,3 +53,22 @@ search.maiconsoft.local {
 qdrant.maiconsoft.local {
   import proxy 6333
 }
+
+ollama.maiconsoft.local {
+  import proxy 11434
+}
+
+prometheus.maiconsoft.local {
+  import proxy 9090
+}
+
+loki.maiconsoft.local {
+  import proxy 3101
+}
+
+# Hub estático — servido pelo próprio Caddy, sem container adicional.
+hub.maiconsoft.local {
+  tls internal
+  root * /srv/hub
+  file_server
+}

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maiconsoft Factory · Hub</title>
+  <style>
+    :root {
+      --bg: #0b0f16;
+      --card: #131a26;
+      --card-hover: #1a2435;
+      --text: #e9eef6;
+      --muted: #94a3b8;
+      --border: #22304a;
+      --white: #ffffff;
+      --yellow: #ffdf00;
+      --green: #009c3b;
+      --blue: #002776;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(1200px 600px at 50% -10%, #16233a 0%, var(--bg) 60%);
+      color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    header { padding: 48px 24px 24px; text-align: center; }
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 42px);
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, var(--white), var(--yellow) 33%, var(--green) 66%, #4aa8ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    header p { margin: 8px 0 0; color: var(--muted); }
+    .flag-bar {
+      height: 4px;
+      border-radius: 4px;
+      margin: 22px auto 0;
+      max-width: 420px;
+      background: linear-gradient(90deg, var(--white), var(--yellow), var(--green), var(--blue));
+    }
+    main {
+      max-width: 1080px;
+      margin: 28px auto 0;
+      padding: 0 24px 56px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 16px;
+    }
+    a.card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    a.card:hover, a.card:focus-visible {
+      transform: translateY(-3px);
+      background: var(--card-hover);
+      border-color: var(--yellow);
+      outline: none;
+    }
+    .top { display: flex; align-items: center; gap: 14px; }
+    .icon {
+      width: 42px; height: 42px;
+      display: grid; place-items: center;
+      background: #0d1420;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 8px;
+      flex: none;
+    }
+    .icon img { max-width: 100%; max-height: 100%; }
+    .name { font-weight: 650; font-size: 17px; }
+    .desc { color: var(--muted); font-size: 13px; min-height: 38px; }
+    .meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .tag {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px 9px;
+    }
+    .open { color: var(--yellow); font-size: 13px; font-weight: 600; }
+    .core .tag { color: var(--green); border-color: #1d6b3b; }
+    .ops .tag { color: #7dd3fc; border-color: #1e4a66; }
+    .sec .tag { color: #fca5a5; border-color: #6b2b2b; }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 0 24px 40px;
+    }
+    code { color: var(--yellow); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Maiconsoft Factory</h1>
+    <p>Hub de serviços · acesso pela rede local</p>
+    <div class="flag-bar" aria-hidden="true"></div>
+  </header>
+
+  <main>
+    <a class="card core" href="http://paperclip.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/paperclip.ico" alt=""></span><span class="name">Paperclip</span></div>
+      <div class="desc">Orquestrador da equipe de 9 agentes autônomos.</div>
+      <div class="meta"><span class="tag">core</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card core" href="http://router.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/9router.svg" alt=""></span><span class="name">9router</span></div>
+      <div class="desc">Gateway unificado de modelos com fallback.</div>
+      <div class="meta"><span class="tag">core</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card core" href="http://chat.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/open-webui.ico" alt=""></span><span class="name">Open WebUI</span></div>
+      <div class="desc">Interface de chat para os modelos locais.</div>
+      <div class="meta"><span class="tag">core</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card core" href="http://langfuse.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/langfuse.ico" alt=""></span><span class="name">Langfuse</span></div>
+      <div class="desc">Observabilidade e traces das chamadas LLM.</div>
+      <div class="meta"><span class="tag">core</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card core" href="http://n8n.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/n8n.svg" alt=""></span><span class="name">n8n</span></div>
+      <div class="desc">Automação de fluxos e integrações.</div>
+      <div class="meta"><span class="tag">core</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card core" href="http://ollama.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/ollama.svg" alt=""></span><span class="name">Ollama</span></div>
+      <div class="desc">Servidor de modelos locais (API).</div>
+      <div class="meta"><span class="tag">core</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card ops" href="http://portainer.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/portainer.svg" alt=""></span><span class="name">Portainer</span></div>
+      <div class="desc">Gerenciamento visual dos containers.</div>
+      <div class="meta"><span class="tag">ops</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card ops" href="http://grafana.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/grafana.svg" alt=""></span><span class="name">Grafana</span></div>
+      <div class="desc">Dashboards de métricas e logs.</div>
+      <div class="meta"><span class="tag">ops</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card ops" href="http://prometheus.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/prometheus.svg" alt=""></span><span class="name">Prometheus</span></div>
+      <div class="desc">Coleta e consulta de métricas.</div>
+      <div class="meta"><span class="tag">ops</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card ops" href="http://loki.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/loki.svg" alt=""></span><span class="name">Loki</span></div>
+      <div class="desc">Agregação de logs da stack.</div>
+      <div class="meta"><span class="tag">ops</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card" href="http://qdrant.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/qdrant.svg" alt=""></span><span class="name">Qdrant</span></div>
+      <div class="desc">Banco vetorial e memória dos agentes.</div>
+      <div class="meta"><span class="tag">data</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card" href="http://search.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/searxng.svg" alt=""></span><span class="name">SearXNG</span></div>
+      <div class="desc">Busca privada para pessoas e agentes.</div>
+      <div class="meta"><span class="tag">intel</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card sec" href="http://vault.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/vaultwarden.svg" alt=""></span><span class="name">Vaultwarden</span></div>
+      <div class="desc">Cofre local de credenciais.</div>
+      <div class="meta"><span class="tag">sec</span><span class="open">Abrir →</span></div>
+    </a>
+
+    <a class="card sec" href="http://sso.maiconsoft.local">
+      <div class="top"><span class="icon"><img src="icons/keycloak.svg" alt=""></span><span class="name">Keycloak</span></div>
+      <div class="desc">Identidade e SSO centralizado.</div>
+      <div class="meta"><span class="tag">sec</span><span class="open">Abrir →</span></div>
+    </a>
+  </main>
+
+  <footer>
+    Os certificados são autoassinados (<code>tls internal</code>): aceite o aviso do navegador na primeira visita.
+    Serviços de perfis não ativados podem não responder.
+  </footer>
+</body>
+</html>
