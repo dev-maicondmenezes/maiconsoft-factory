@@ -29,20 +29,27 @@ step() {
 }
 
 ask_yes_no() {
-  local prompt="$1" answer
-  read -r -p "${Y}❓ ${prompt} [s/N] ${Z}" answer || true
+  local prompt="$1" answer=""
+  # O installer roda via 'curl | bash': o stdin é o pipe do script,
+  # então a interação precisa vir do terminal de controle (/dev/tty).
+  if [ -e /dev/tty ]; then
+    read -r -p "${Y}❓ ${prompt} [s/N] ${Z}" answer < /dev/tty || true
+  fi
   [[ "${answer:-}" =~ ^[sS]$ ]]
 }
 
 # whiptail com fallback para leitura simples
 choose_checklist() {
   local title="$1" text="$2"
-  if command -v whiptail >/dev/null 2>&1 && [ -t 0 ]; then
-    whiptail --title "$title" --checklist "$text" 20 78 12 "${@:3}" 3>&1 1>&2 2>&3
+  if command -v whiptail >/dev/null 2>&1 && [ -e /dev/tty ]; then
+    whiptail --title "$title" --checklist "$text" 20 78 12 "${@:3}" 3>&1 1>&2 2>&3 < /dev/tty
   else
     info "$text"
     printf '%s\n' "${@:3}" | sed 's/"$//' >&2
-    read -r -p "${Y}Digite os itens desejados (separados por espaço) ou Enter para pular: ${Z}" REPLY || true
+    REPLY=""
+    if [ -e /dev/tty ]; then
+      read -r -p "${Y}Digite os itens desejados (separados por espaço) ou Enter para pular: ${Z}" REPLY < /dev/tty || true
+    fi
     printf '%s' "${REPLY:-}"
   fi
 }

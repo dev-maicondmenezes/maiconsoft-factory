@@ -23,15 +23,17 @@ for r in "${REPOS[@]}"; do
 done
 
 chosen=""
-if has whiptail && [ -t 0 ]; then
+if has whiptail && [ -e /dev/tty ]; then
   chosen="$(whiptail --title "Clonar repositórios" --checklist \
-    "Quais repositórios deseja clonar para ${PROJECTS_DIR}?" 22 80 14 \
-    "${ITEMS[@]}" 3>&1 1>&2 2>&3 || true)"
+    "Quais repositórios deseja clonar para ${PROJECTS_DIR}? (espaço = marcar, Enter = confirmar)" 22 80 14 \
+    "${ITEMS[@]}" 3>&1 1>&2 2>&3 < /dev/tty || true)"
   chosen="$(printf '%s' "$chosen" | tr -d '"')"
 else
   printf '\n'
   for r in "${REPOS[@]}"; do info "  • $r"; done
-  read -r -p "Digite os nomes (separados por espaço) ou Enter para pular: " chosen || true
+  if [ -e /dev/tty ]; then
+    read -r -p "Digite os nomes (separados por espaço) ou Enter para pular: " chosen < /dev/tty || true
+  fi
 fi
 
 [ -n "$chosen" ] || { info "Nenhum repositório selecionado."; exit 0; }

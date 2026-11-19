@@ -81,6 +81,10 @@ VS Code, OpenCode CLI + Desktop, Antigravity IDE, Cortex, Go, Node.js, GitHub CL
 
 Todos os serviços ficam em `127.0.0.1`. O **Caddy** é o único exposto na LAN, com `tls internal` e nomes publicados via **Avahi mDNS**: `paperclip.maiconsoft.local`, `chat.maiconsoft.local`, `router.maiconsoft.local`, `langfuse.maiconsoft.local`, `n8n.maiconsoft.local`, `grafana.maiconsoft.local`, `portainer.maiconsoft.local`, `vault.maiconsoft.local`, `sso.maiconsoft.local`, `search.maiconsoft.local`, `qdrant.maiconsoft.local`.
 
+> ⚠️ O Avahi **não anuncia `127.0.0.1`**. O instalador detecta o IP real da LAN e publica esse endereço no `/etc/avahi/hosts` **e** no `/etc/hosts` local. Se o IP mudar (DHCP), rode novamente `install/05-repo.sh` ou reinicie a máquina para atualizar os registros.
+
+> 💡 Como o instalador é usado via `curl … | bash`, o stdin é o pipe do script. Os prompts interativos (senha, perfis, seleção de repositórios) leem de `/dev/tty`, então o wizard funciona normalmente mesmo nesse formato.
+
 ---
 
 ## 🤖 Equipe Paperclip

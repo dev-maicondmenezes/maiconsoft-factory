@@ -7,7 +7,12 @@ set -Eeuo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HERE/install/lib/common.sh"
 
-pause() { read -r -p "${D}↵ Enter para continuar...${Z}" || true; echo; }
+pause() {
+  if [ -e /dev/tty ]; then
+    read -r -p "${D}↵ Enter para continuar...${Z}" < /dev/tty || true
+  fi
+  echo
+}
 
 section "🧩 Configuração guiada"
 info "Esta etapa conecta as contas que serão usadas em TODAS as ferramentas."

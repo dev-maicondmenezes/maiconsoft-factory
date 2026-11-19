@@ -56,17 +56,34 @@ if [ -f "${FACTORY_DIR}/config/opencode/config.json" ]; then
 fi
 
 info "Publicando nomes .local na rede (Avahi mDNS)..."
+# Avahi não anuncia 127.0.0.1 na rede: precisamos do IP real da LAN.
+LAN_IP="$(ip -4 -o route get 1.1.1.1 2>/dev/null | awk '{for (i=1;i<=NF;i++) if ($i=="src") print $(i+1)}' | head -1 || true)"
+[ -n "$LAN_IP" ] || LAN_IP="$(hostname -I 2>/dev/null | awk '{print $1}' || true)"
+[ -n "$LAN_IP" ] || LAN_IP="127.0.0.1"
+if [ "$LAN_IP" = "127.0.0.1" ]; then
+  warn "IP da LAN não detectado; nomes funcionarão apenas localmente."
+fi
+
+HOSTS=(paperclip chat router langfuse n8n portainer grafana vault sso search qdrant factory)
+
 cat > /tmp/ms-avahi <<EOF
 # Maiconsoft Factory — gerado por install/05-repo.sh
 EOF
-for host in paperclip chat router langfuse n8n portainer grafana vault sso search qdrant factory; do
-  echo "127.0.0.1 ${host}.maiconsoft.local" >> /tmp/ms-avahi
+for host in "${HOSTS[@]}"; do
+  echo "${LAN_IP} ${host}.maiconsoft.local" >> /tmp/ms-avahi
 done
 $SUDO install -m 0644 /tmp/ms-avahi /etc/avahi/hosts
 rm -f /tmp/ms-avahi
+
+# Resolução imediata no próprio host (mDNS pode não estar ativo na sessão).
+$SUDO sed -i '/\.maiconsoft\.local/d' /etc/hosts
+for host in "${HOSTS[@]}"; do
+  echo "${LAN_IP} ${host}.maiconsoft.local" | $SUDO tee -a /etc/hosts >/dev/null
+done
+
 $SUDO systemctl enable --now avahi-daemon >/dev/null 2>&1 || true
 $SUDO systemctl restart avahi-daemon >/dev/null 2>&1 || true
-ok "Nomes *.maiconsoft.local publicados via mDNS."
+ok "Nomes *.maiconsoft.local → ${LAN_IP} (Avahi + /etc/hosts)."
 
 info "Ajustando firewall (UFW instalado, mas não ativado automaticamente)..."
 if has ufw; then

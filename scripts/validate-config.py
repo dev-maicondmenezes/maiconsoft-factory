@@ -225,15 +225,16 @@ def validate_dns_consistency() -> None:
     caddy = read("config/caddy/Caddyfile")
     caddy_hosts = set(re.findall(r"([a-z0-9-]+\.maiconsoft\.local)", caddy))
     installer = read("install/05-repo.sh")
-    loop = re.search(r"for host in ([^;]+); do", installer)
-    avahi_hosts = set(re.findall(r"\b[a-z0-9-]+\.maiconsoft\.local\b", loop.group(1))) if loop else set()
-    # o install/05 forma o nome com "${host}.maiconsoft.local"
-    if loop:
-        avahi_hosts = {f"{h}.maiconsoft.local" for h in loop.group(1).split()}
+    arr = re.search(r"^HOSTS=\(([^)]+)\)", installer, re.M)
+    short_names = arr.group(1).split() if arr else []
+    avahi_hosts = {f"{h}.maiconsoft.local" for h in short_names}
     check(bool(caddy_hosts), "Caddyfile define nomes *.maiconsoft.local")
     check(caddy_hosts == avahi_hosts,
           f"Avahi publica os mesmos nomes do Caddy "
           f"(Caddy={sorted(caddy_hosts)}, Avahi={sorted(avahi_hosts)})")
+    check("LAN_IP" in installer and 'echo "127.0.0.1 ${host}' not in installer,
+          "Avahi usa o IP da LAN (nunca 127.0.0.1)")
+    check("/etc/hosts" in installer, "nomes também são gravados no /etc/hosts local")
 
 
 def main() -> int:

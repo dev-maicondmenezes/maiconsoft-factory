@@ -112,6 +112,7 @@ jobs:
           sed -n "${last_art}p" /tmp/banner.txt | grep -qF $'\033[38;2;0;39;118m' # base azul
           grep -qF '\033[2J\033[H\033[3J' install.sh install/lib/ui.sh   # limpeza de tela
           grep -qE '^[[:space:]]*clear_screen$' boot.sh
+          grep -qF '< /dev/tty' install.sh install/lib/ui.sh configure.sh scripts/gh-clone-repos.sh
           echo "::notice::Maiconsoft© com degradê vertical e limpeza de tela presentes"
 
       - name: Wizard e healthcheck executam sem erros de sintaxe em modo CI
@@ -205,6 +206,9 @@ jobs:
           test -f /etc/profile.d/maiconsoft.sh
           test -f /etc/maiconsoft/profiles
           grep -qx 'core' /etc/maiconsoft/profiles
+          echo "== dns .local =="
+          ! grep -q '^127\.0\.0\.1.*maiconsoft\.local' /etc/avahi/hosts
+          grep -q 'maiconsoft\.local' /etc/hosts
           echo "== wallpapers =="
           test -f /home/maiconsoft/Pictures/maiconsoft_bg_ligth.jpeg
           test -f /home/maiconsoft/Pictures/maiconsoft_bg_dark.png

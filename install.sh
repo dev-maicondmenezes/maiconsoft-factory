@@ -104,12 +104,12 @@ fi
 $SUDO usermod -aG sudo,docker "$FACTORY_USER"
 $SUDO install -d -m 0755 -o "$FACTORY_USER" -g "$FACTORY_USER" "$FACTORY_HOME"
 
-# Senha: só pede se houver terminal interativo (CI nunca é interativo)
-if [ -t 0 ] && [ "${MAICONSOFT_CI:-0}" != "1" ]; then
+# Senha: usa /dev/tty porque o stdin é o pipe do 'curl | bash'
+if [ -e /dev/tty ] && [ "${MAICONSOFT_CI:-0}" != "1" ]; then
   passwd_state="$($SUDO passwd -S "$FACTORY_USER" 2>/dev/null | awk '{print $2}' || true)"
   if [ "$passwd_state" = "L" ] || [ "$passwd_state" = "NP" ] || [ -z "$passwd_state" ]; then
     printf "${Y}🔐 Defina a senha do usuário '${FACTORY_USER}' (Enter para deixar bloqueada e definir depois): ${Z}"
-    read -rs factory_pass || true
+    read -rs factory_pass < /dev/tty || true
     echo
     if [ -n "${factory_pass:-}" ]; then
       printf '%s:%s\n' "$FACTORY_USER" "$factory_pass" | $SUDO chpasswd
