@@ -235,6 +235,9 @@ def validate_dns_consistency() -> None:
     check("LAN_IP" in installer and 'echo "127.0.0.1 ${host}' not in installer,
           "Avahi usa o IP da LAN (nunca 127.0.0.1)")
     check("/etc/hosts" in installer, "nomes também são gravados no /etc/hosts local")
+    bootstrap = read("install.sh")
+    check("safe.directory" in bootstrap and "reset --hard" in bootstrap,
+          "bootstrap atualiza o clone mesmo com propriedade diferente (safe.directory + reset)")
 
 
 def main() -> int:

@@ -123,14 +123,28 @@ fi
 # ------------------------------------------------------------
 # Clone do repositório (público — não precisa de token)
 # ------------------------------------------------------------
+git_factory() { $SUDO git -c safe.directory="$FACTORY_DIR" -C "$FACTORY_DIR" "$@"; }
+
 info "Clonando/atualizando a factory em ${FACTORY_DIR} ..."
 if [ ! -d "$FACTORY_DIR/.git" ]; then
   $SUDO rm -rf "$FACTORY_DIR"
   $SUDO git clone --depth 1 "$REPO_URL" "$FACTORY_DIR" || die "Falha ao clonar $REPO_URL"
   ok "Repositório clonado."
 else
-  $SUDO git -C "$FACTORY_DIR" pull --ff-only || warn "Não foi possível atualizar o clone (continuando com a versão local)."
-  ok "Repositório já existia — atualizado."
+  # O clone é do usuário maiconsoft; sem safe.directory o git recusa operar via sudo.
+  if ! git_factory pull --ff-only >/dev/null 2>&1; then
+    warn "Pull rápido falhou — sincronizando com a branch remota..."
+    BRANCH="$(git_factory rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+    [ -n "$BRANCH" ] && [ "$BRANCH" != "HEAD" ] || BRANCH="main"
+    if git_factory fetch origin "$BRANCH" >/dev/null 2>&1 &&
+       git_factory reset --hard "origin/${BRANCH}" >/dev/null 2>&1; then
+      ok "Clone sincronizado com origin/${BRANCH}."
+    else
+      die "Não foi possível atualizar ${FACTORY_DIR}. Abortando para não instalar versão antiga."
+    fi
+  else
+    ok "Repositório já existia — atualizado."
+  fi
 fi
 $SUDO chown -R "${FACTORY_USER}:${FACTORY_USER}" "$FACTORY_DIR"
 $SUDO install -d -m 0755 -o "$FACTORY_USER" -g "$FACTORY_USER" "${FACTORY_DIR}/projects"
