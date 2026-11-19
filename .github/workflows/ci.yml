@@ -108,7 +108,9 @@ jobs:
           grep -qF $'\033[38;2;0;39;118m' /tmp/banner.txt      # azul
           head -1 /tmp/banner.txt | grep -qF $'\033[38;2;255;255;255m'  # topo branco
           sed -n '5p' /tmp/banner.txt | grep -qF $'\033[38;2;0;39;118m' # base azul
-          echo "::notice::Maiconsoft© com degradê vertical branco → azul presente"
+          grep -qF '\033[2J\033[H\033[3J' install.sh install/lib/ui.sh   # limpeza de tela
+          grep -qE '^[[:space:]]*clear_screen$' boot.sh
+          echo "::notice::Maiconsoft© com degradê vertical e limpeza de tela presentes"
 
       - name: Wizard e healthcheck executam sem erros de sintaxe em modo CI
         env:

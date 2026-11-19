@@ -11,6 +11,9 @@ export B='\033[1m'      # negrito
 export D='\033[2m'      # fraco
 export Z='\033[0m'      # reset
 
+# Limpa a tela e o scrollback (não depende de TERM nem do binário clear).
+clear_screen() { printf '\033[2J\033[H\033[3J'; }
+
 info() { printf "${C}ℹ️  %s${Z}\n" "$*"; }
 ok()   { printf "${G}✅ %s${Z}\n" "$*"; }
 warn() { printf "${Y}⚠️  %s${Z}\n" "$*"; }

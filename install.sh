@@ -49,12 +49,16 @@ ART
   printf "\n${D}   Maiconsoft© · Software house autônoma · IA local · orquestração de agentes${Z}\n\n"
 }
 
+# Limpa a tela e o scrollback antes de iniciar (não depende de TERM/clear).
+clear_screen() { printf '\033[2J\033[H\033[3J'; }
+
 info() { printf "${C}ℹ️  %s${Z}\n" "$*"; }
 ok()   { printf "${G}✅ %s${Z}\n" "$*"; }
 warn() { printf "${Y}⚠️  %s${Z}\n" "$*"; }
 err()  { printf "${R}❌ %s${Z}\n" "$*" >&2; }
 die()  { err "$*"; exit 1; }
 
+clear_screen
 banner
 
 info "Preparando privilégios (sudo)..."

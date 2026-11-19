@@ -27,6 +27,7 @@ STEPS=(
 
 main() {
   cd "$FACTORY_DIR"
+  clear_screen
   print_full_banner
 
   section "Plano de instalação"
